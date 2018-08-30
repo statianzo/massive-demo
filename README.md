@@ -166,7 +166,7 @@ Here's a sample request body for Postman:
 }
 ```
 
-### Step 11 (Optional): Consistent API
+### Step 11: Consistent API
 
 Let's keep our API consistent when reading and writing. After creating a new
 incident, return the incident with the same fields as step 7:
@@ -185,37 +185,39 @@ on the `RETURNING` keyword.
 Add `RETURNING id` to your `INSERT` statement from step 11.
 
 
-### Step 12 (Optional): Server side rendering
+### Step 12: Environment variables
 
-Let's return some HTML by rendering on the server with React. For the root
-route `/`, using the same query from step 10, render an HTML list of all
-incidents. Here's some boilerplate HTML:
+Hardcoding your connection string within code is not a good practice.  It can
+lead to exposure of sensitive information and can make it difficult to switch
+between environments.
 
-```html
-<html>
-<head>
-  <title>Incidents</title>
-</head>
-<body>
-  <h1>Incidents</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Id</th><th>State</th><th>Injury</th><th>Affected Area</th><th>Cause</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td><td>UT</td><td>Pulled Groin</td><td>Groin</td><td>Jumping jacks</td>
-      </tr>
-      <!-- one tr for each incident -->
-    </tbody>
-  </table>
-</body>
-</html>
+Instead of hard coding, we can use envrionment variables to tell our Node
+process what connection string to use. Node exposes a global obect called
+`process` with a property called `env` to read these variables.
+
+```js
+const connectionString = process.env.DATABASE_URL;
 ```
 
-Hint:
+Environment variables can be passed into Node when starting by
+defining them when calling `node`
 
-`require('react-dom/server').renderToString` will render React components as a
-string. Returning that from express will be rendered as html.
+```sh
+DATABASE_URL=postgres://yoururl node server.js
+```
+
+Rather than having to remember to type our local database credentials every
+time we start, we can use a npm package called `dotenv`. It allows creating a
+`.env` file in the project with a list of environment variables.
+
+```
+DATABASE_URL=postgres://yoururl
+OTHER_VARIABLE=xyz
+```
+
+*Be sure to add `.env` to `.gitignore` so it doesn't get committed.*
+
+One benefit to naming your connection string variable `DATABASE_URL` is that
+Heroku will
+[automatically set it](https://devcenter.heroku.com/articles/heroku-postgresql#designating-a-primary-database)
+when booting your application.
